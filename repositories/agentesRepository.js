@@ -39,9 +39,12 @@ function create(dadosAgente) {
 function update(id, dadosAgente) {
     const index = agentes.findIndex(agente => agente.id === id);
     if (index !== -1) {
+        // Remover o campo 'id' dos dados a serem atualizados para proteger o ID
+        const { id: _, ...dadosLimpos } = dadosAgente;
+        
         agentes[index] = {
             ...agentes[index],
-            ...dadosAgente
+            ...dadosLimpos
         };
         return agentes[index];
     }

@@ -62,6 +62,32 @@ function createAgente(req, res) {
                 }
             });
         }
+
+        // Validação de formato de data
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(dadosAgente.dataDeIncorporacao)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve estar no formato YYYY-MM-DD"
+                }
+            });
+        }
+
+        // Verificar se não é data futura
+        const inputDate = new Date(dadosAgente.dataDeIncorporacao + 'T00:00:00');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (inputDate > today) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    dataDeIncorporacao: "Campo 'dataDeIncorporacao' não pode ser uma data futura"
+                }
+            });
+        }
         
         const novoAgente = agentesRepository.create(dadosAgente);
         res.status(201).json(novoAgente);
@@ -78,6 +104,45 @@ function updateAgente(req, res) {
     try {
         const { id } = req.params;
         const dadosAgente = req.body;
+        
+        // Verificar se está tentando alterar o ID
+        if (dadosAgente.id !== undefined) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    id: "Campo 'id' não pode ser alterado"
+                }
+            });
+        }
+
+        // Validação básica de formato de data se fornecida
+        if (dadosAgente.dataDeIncorporacao) {
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(dadosAgente.dataDeIncorporacao)) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Parâmetros inválidos",
+                    errors: {
+                        dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve estar no formato YYYY-MM-DD"
+                    }
+                });
+            }
+
+            // Verificar se não é data futura
+            const inputDate = new Date(dadosAgente.dataDeIncorporacao + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (inputDate > today) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Parâmetros inválidos",
+                    errors: {
+                        dataDeIncorporacao: "Campo 'dataDeIncorporacao' não pode ser uma data futura"
+                    }
+                });
+            }
+        }
         
         const agenteAtualizado = agentesRepository.update(id, dadosAgente);
         

@@ -109,15 +109,12 @@ function createCaso(req, res) {
             });
         }
         
-        // Verificar se agente existe
+        // Verificar se agente existe - retornar 404 se não existir
         const agente = agentesRepository.findById(dadosCaso.agente_id);
         if (!agente) {
-            return res.status(400).json({
-                status: 400,
-                message: "Parâmetros inválidos",
-                errors: {
-                    agente_id: "Agente especificado não existe"
-                }
+            return res.status(404).json({
+                status: 404,
+                message: "Agente não encontrado"
             });
         }
         
@@ -137,6 +134,17 @@ function updateCaso(req, res) {
         const { id } = req.params;
         const dadosCaso = req.body;
         
+        // Verificar se está tentando alterar o ID
+        if (dadosCaso.id !== undefined) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    id: "Campo 'id' não pode ser alterado"
+                }
+            });
+        }
+
         // Validar status se fornecido
         if (dadosCaso.status && !['aberto', 'solucionado'].includes(dadosCaso.status)) {
             return res.status(400).json({

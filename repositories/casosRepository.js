@@ -42,9 +42,12 @@ function create(dadosCaso) {
 function update(id, dadosCaso) {
     const index = casos.findIndex(caso => caso.id === id);
     if (index !== -1) {
+        // Remover o campo 'id' dos dados a serem atualizados para proteger o ID
+        const { id: _, ...dadosLimpos } = dadosCaso;
+        
         casos[index] = {
             ...casos[index],
-            ...dadosCaso
+            ...dadosLimpos
         };
         return casos[index];
     }
