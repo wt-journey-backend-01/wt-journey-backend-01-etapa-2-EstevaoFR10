@@ -116,8 +116,9 @@ function updateAgente(req, res) {
             });
         }
 
-        // Validação simples para detectar payload em formato incorreto (tipos não-string em campos principais)
-        if (dadosAgente.nome !== undefined && dadosAgente.nome !== null && typeof dadosAgente.nome !== 'string') {
+        // Validação ampla para detectar payload em formato incorreto
+        // Verificar se algum campo obrigatório tem tipo incorreto
+        if (dadosAgente.nome !== undefined && (typeof dadosAgente.nome !== 'string' && dadosAgente.nome !== null)) {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -127,7 +128,7 @@ function updateAgente(req, res) {
             });
         }
 
-        if (dadosAgente.cargo !== undefined && dadosAgente.cargo !== null && typeof dadosAgente.cargo !== 'string') {
+        if (dadosAgente.cargo !== undefined && (typeof dadosAgente.cargo !== 'string' && dadosAgente.cargo !== null)) {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -137,7 +138,7 @@ function updateAgente(req, res) {
             });
         }
 
-        if (dadosAgente.dataDeIncorporacao !== undefined && dadosAgente.dataDeIncorporacao !== null && typeof dadosAgente.dataDeIncorporacao !== 'string') {
+        if (dadosAgente.dataDeIncorporacao !== undefined && (typeof dadosAgente.dataDeIncorporacao !== 'string' && dadosAgente.dataDeIncorporacao !== null)) {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -145,6 +146,20 @@ function updateAgente(req, res) {
                     dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve ser uma string"
                 }
             });
+        }
+
+        // Verificar campos não permitidos (pode ser array, object, etc.)
+        const camposPermitidos = ['nome', 'dataDeIncorporacao', 'cargo'];
+        for (const campo in dadosAgente) {
+            if (campo !== 'id' && !camposPermitidos.includes(campo)) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Parâmetros inválidos",
+                    errors: {
+                        [campo]: `Campo '${campo}' não é permitido`
+                    }
+                });
+            }
         }
 
         // Validação básica de formato de data se fornecida

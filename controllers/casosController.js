@@ -145,6 +145,62 @@ function updateCaso(req, res) {
             });
         }
 
+        // Validação de payload em formato incorreto
+        // Verificar se algum campo tem tipo incorreto
+        if (dadosCaso.titulo !== undefined && (typeof dadosCaso.titulo !== 'string' && dadosCaso.titulo !== null)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    titulo: "Campo 'titulo' deve ser uma string"
+                }
+            });
+        }
+
+        if (dadosCaso.descricao !== undefined && (typeof dadosCaso.descricao !== 'string' && dadosCaso.descricao !== null)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    descricao: "Campo 'descricao' deve ser uma string"
+                }
+            });
+        }
+
+        if (dadosCaso.status !== undefined && (typeof dadosCaso.status !== 'string' && dadosCaso.status !== null)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    status: "Campo 'status' deve ser uma string"
+                }
+            });
+        }
+
+        if (dadosCaso.agente_id !== undefined && (typeof dadosCaso.agente_id !== 'string' && dadosCaso.agente_id !== null)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    agente_id: "Campo 'agente_id' deve ser uma string"
+                }
+            });
+        }
+
+        // Verificar campos não permitidos
+        const camposPermitidos = ['titulo', 'descricao', 'status', 'agente_id'];
+        for (const campo in dadosCaso) {
+            if (campo !== 'id' && !camposPermitidos.includes(campo)) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Parâmetros inválidos",
+                    errors: {
+                        [campo]: `Campo '${campo}' não é permitido`
+                    }
+                });
+            }
+        }
+
         // Validar status se fornecido
         if (dadosCaso.status && !['aberto', 'solucionado'].includes(dadosCaso.status)) {
             return res.status(400).json({
