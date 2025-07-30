@@ -148,13 +148,7 @@ function updateCaso(req, res) {
         // Validação extremamente rigorosa para payload inválido
         // Verificar se o body está vazio ou tem formato inválido
         if (!dadosCaso || typeof dadosCaso !== 'object' || Array.isArray(dadosCaso)) {
-            return res.status(400).json({
-                status: 400,
-                message: "Parâmetros inválidos",
-                errors: {
-                    body: "Payload deve ser um objeto válido"
-                }
-            });
+            return res.status(400).send();
         }
 
         // Verificar cada campo individualmente com validação extrema
@@ -163,24 +157,12 @@ function updateCaso(req, res) {
             
             // Se não é um campo permitido
             if (!['titulo', 'descricao', 'status', 'agente_id'].includes(campo)) {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        [campo]: `Campo '${campo}' não é permitido`
-                    }
-                });
+                return res.status(400).send();
             }
             
             // Se o valor não é string, null ou undefined
             if (valor !== null && valor !== undefined && typeof valor !== 'string') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        [campo]: `Campo '${campo}' deve ser uma string`
-                    }
-                });
+                return res.status(400).send();
             }
         }
 

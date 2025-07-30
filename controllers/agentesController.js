@@ -119,13 +119,7 @@ function updateAgente(req, res) {
         // Validação extremamente rigorosa - qualquer formato incorreto = 400
         // Verificar se o body está vazio ou tem formato inválido
         if (!dadosAgente || typeof dadosAgente !== 'object' || Array.isArray(dadosAgente)) {
-            return res.status(400).json({
-                status: 400,
-                message: "Parâmetros inválidos",
-                errors: {
-                    body: "Payload deve ser um objeto válido"
-                }
-            });
+            return res.status(400).send();
         }
 
         // Verificar cada campo individualmente com validação extrema
@@ -134,35 +128,17 @@ function updateAgente(req, res) {
             
             // Se não é um campo permitido
             if (!['nome', 'dataDeIncorporacao', 'cargo'].includes(campo)) {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        [campo]: `Campo '${campo}' não é permitido`
-                    }
-                });
+                return res.status(400).send();
             }
             
             // Se o valor não é string, null ou undefined
             if (valor !== null && valor !== undefined && typeof valor !== 'string') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        [campo]: `Campo '${campo}' deve ser uma string`
-                    }
-                });
+                return res.status(400).send();
             }
             
             // Se é string vazia em campo obrigatório (para PUT)
             if (campo === 'nome' && valor === '') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        nome: "Campo 'nome' não pode estar vazio"
-                    }
-                });
+                return res.status(400).send();
             }
         }
 
