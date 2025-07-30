@@ -134,8 +134,8 @@ function updateAgente(req, res) {
             });
         }
 
-        // Validação de tipos de dados para campos fornecidos
-        if (dadosAgente.nome !== undefined && typeof dadosAgente.nome !== 'string') {
+        // Validação de tipos de dados para campos fornecidos - só valida se o valor não for string válida
+        if (dadosAgente.nome !== undefined && dadosAgente.nome !== null && dadosAgente.nome !== '' && typeof dadosAgente.nome !== 'string') {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -145,7 +145,7 @@ function updateAgente(req, res) {
             });
         }
 
-        if (dadosAgente.dataDeIncorporacao !== undefined && typeof dadosAgente.dataDeIncorporacao !== 'string') {
+        if (dadosAgente.dataDeIncorporacao !== undefined && dadosAgente.dataDeIncorporacao !== null && dadosAgente.dataDeIncorporacao !== '' && typeof dadosAgente.dataDeIncorporacao !== 'string') {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -155,7 +155,7 @@ function updateAgente(req, res) {
             });
         }
 
-        if (dadosAgente.cargo !== undefined && typeof dadosAgente.cargo !== 'string') {
+        if (dadosAgente.cargo !== undefined && dadosAgente.cargo !== null && dadosAgente.cargo !== '' && typeof dadosAgente.cargo !== 'string') {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -165,8 +165,8 @@ function updateAgente(req, res) {
             });
         }
 
-        // Validação de valores específicos
-        if (dadosAgente.cargo !== undefined) {
+        // Validação de valores específicos - só valida se cargo for fornecido e não vazio
+        if (dadosAgente.cargo && dadosAgente.cargo.trim() !== '') {
             const cargosValidos = ['delegado', 'inspetor', 'escrivao', 'agente'];
             if (!cargosValidos.includes(dadosAgente.cargo)) {
                 return res.status(400).json({
