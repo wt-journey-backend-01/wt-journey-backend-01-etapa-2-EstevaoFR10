@@ -116,59 +116,24 @@ function updateAgente(req, res) {
             });
         }
 
-        // Validação rigorosa para detectar qualquer payload em formato incorreto
-        // Verificar se algum campo tem tipo incorreto (incluindo arrays, objects, etc.)
-        if (dadosAgente.nome !== undefined && dadosAgente.nome !== null) {
-            if (typeof dadosAgente.nome !== 'string' || Array.isArray(dadosAgente.nome) || typeof dadosAgente.nome === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        nome: "Campo 'nome' deve ser uma string"
-                    }
-                });
-            }
-        }
-
-        if (dadosAgente.cargo !== undefined && dadosAgente.cargo !== null) {
-            if (typeof dadosAgente.cargo !== 'string' || Array.isArray(dadosAgente.cargo) || typeof dadosAgente.cargo === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        cargo: "Campo 'cargo' deve ser uma string"
-                    }
-                });
-            }
-        }
-
-        if (dadosAgente.dataDeIncorporacao !== undefined && dadosAgente.dataDeIncorporacao !== null) {
-            if (typeof dadosAgente.dataDeIncorporacao !== 'string' || Array.isArray(dadosAgente.dataDeIncorporacao) || typeof dadosAgente.dataDeIncorporacao === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve ser uma string"
-                    }
-                });
-            }
-        }
-
-        // Verificar se há campos com valores vazios de string quando deveriam ter conteúdo
-        if (dadosAgente.nome === '') {
+        // Validação extremamente rigorosa - qualquer formato incorreto = 400
+        // Verificar se o body está vazio ou tem formato inválido
+        if (!dadosAgente || typeof dadosAgente !== 'object' || Array.isArray(dadosAgente)) {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
                 errors: {
-                    nome: "Campo 'nome' não pode estar vazio"
+                    body: "Payload deve ser um objeto válido"
                 }
             });
         }
 
-        // Verificar campos não permitidos (arrays, objects, funções, etc.)
-        const camposPermitidos = ['nome', 'dataDeIncorporacao', 'cargo'];
-        for (const campo in dadosAgente) {
-            if (campo !== 'id' && !camposPermitidos.includes(campo)) {
+        // Verificar cada campo individualmente com validação extrema
+        for (const [campo, valor] of Object.entries(dadosAgente)) {
+            if (campo === 'id') continue; // ID já validado acima
+            
+            // Se não é um campo permitido
+            if (!['nome', 'dataDeIncorporacao', 'cargo'].includes(campo)) {
                 return res.status(400).json({
                     status: 400,
                     message: "Parâmetros inválidos",
@@ -177,14 +142,25 @@ function updateAgente(req, res) {
                     }
                 });
             }
-            // Verificar se o valor do campo é um tipo não suportado
-            const valor = dadosAgente[campo];
-            if (valor !== null && valor !== undefined && (Array.isArray(valor) || (typeof valor === 'object' && valor.constructor === Object))) {
+            
+            // Se o valor não é string, null ou undefined
+            if (valor !== null && valor !== undefined && typeof valor !== 'string') {
                 return res.status(400).json({
                     status: 400,
                     message: "Parâmetros inválidos",
                     errors: {
-                        [campo]: `Campo '${campo}' tem formato inválido`
+                        [campo]: `Campo '${campo}' deve ser uma string`
+                    }
+                });
+            }
+            
+            // Se é string vazia em campo obrigatório (para PUT)
+            if (campo === 'nome' && valor === '') {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Parâmetros inválidos",
+                    errors: {
+                        nome: "Campo 'nome' não pode estar vazio"
                     }
                 });
             }

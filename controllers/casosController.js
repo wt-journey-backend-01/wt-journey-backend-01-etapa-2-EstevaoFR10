@@ -145,60 +145,24 @@ function updateCaso(req, res) {
             });
         }
 
-        // Validação rigorosa de payload em formato incorreto
-        // Verificar se algum campo tem tipo incorreto (incluindo arrays, objects, etc.)
-        if (dadosCaso.titulo !== undefined && dadosCaso.titulo !== null) {
-            if (typeof dadosCaso.titulo !== 'string' || Array.isArray(dadosCaso.titulo) || typeof dadosCaso.titulo === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        titulo: "Campo 'titulo' deve ser uma string"
-                    }
-                });
-            }
+        // Validação extremamente rigorosa para payload inválido
+        // Verificar se o body está vazio ou tem formato inválido
+        if (!dadosCaso || typeof dadosCaso !== 'object' || Array.isArray(dadosCaso)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    body: "Payload deve ser um objeto válido"
+                }
+            });
         }
 
-        if (dadosCaso.descricao !== undefined && dadosCaso.descricao !== null) {
-            if (typeof dadosCaso.descricao !== 'string' || Array.isArray(dadosCaso.descricao) || typeof dadosCaso.descricao === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        descricao: "Campo 'descricao' deve ser uma string"
-                    }
-                });
-            }
-        }
-
-        if (dadosCaso.status !== undefined && dadosCaso.status !== null) {
-            if (typeof dadosCaso.status !== 'string' || Array.isArray(dadosCaso.status) || typeof dadosCaso.status === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        status: "Campo 'status' deve ser uma string"
-                    }
-                });
-            }
-        }
-
-        if (dadosCaso.agente_id !== undefined && dadosCaso.agente_id !== null) {
-            if (typeof dadosCaso.agente_id !== 'string' || Array.isArray(dadosCaso.agente_id) || typeof dadosCaso.agente_id === 'object') {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        agente_id: "Campo 'agente_id' deve ser uma string"
-                    }
-                });
-            }
-        }
-
-        // Verificar campos não permitidos e tipos inválidos
-        const camposPermitidos = ['titulo', 'descricao', 'status', 'agente_id'];
-        for (const campo in dadosCaso) {
-            if (campo !== 'id' && !camposPermitidos.includes(campo)) {
+        // Verificar cada campo individualmente com validação extrema
+        for (const [campo, valor] of Object.entries(dadosCaso)) {
+            if (campo === 'id') continue; // ID já validado acima
+            
+            // Se não é um campo permitido
+            if (!['titulo', 'descricao', 'status', 'agente_id'].includes(campo)) {
                 return res.status(400).json({
                     status: 400,
                     message: "Parâmetros inválidos",
@@ -207,14 +171,14 @@ function updateCaso(req, res) {
                     }
                 });
             }
-            // Verificar se o valor do campo é um tipo não suportado
-            const valor = dadosCaso[campo];
-            if (valor !== null && valor !== undefined && (Array.isArray(valor) || (typeof valor === 'object' && valor.constructor === Object))) {
+            
+            // Se o valor não é string, null ou undefined
+            if (valor !== null && valor !== undefined && typeof valor !== 'string') {
                 return res.status(400).json({
                     status: 400,
                     message: "Parâmetros inválidos",
                     errors: {
-                        [campo]: `Campo '${campo}' tem formato inválido`
+                        [campo]: `Campo '${campo}' deve ser uma string`
                     }
                 });
             }
