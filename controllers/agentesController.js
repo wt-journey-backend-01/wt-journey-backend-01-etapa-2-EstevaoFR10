@@ -116,6 +116,69 @@ function updateAgente(req, res) {
             });
         }
 
+        // Validação de tipos de dados - detectar payload em formato incorreto
+        const camposPermitidos = ['nome', 'dataDeIncorporacao', 'cargo'];
+        
+        // Verificar se há campos não permitidos
+        const camposInvalidos = Object.keys(dadosAgente).filter(campo => 
+            campo !== 'id' && !camposPermitidos.includes(campo)
+        );
+        
+        if (camposInvalidos.length > 0) {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    [camposInvalidos[0]]: `Campo '${camposInvalidos[0]}' não é permitido`
+                }
+            });
+        }
+
+        // Validação de tipos de dados para campos fornecidos
+        if (dadosAgente.nome !== undefined && typeof dadosAgente.nome !== 'string') {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    nome: "Campo 'nome' deve ser uma string"
+                }
+            });
+        }
+
+        if (dadosAgente.dataDeIncorporacao !== undefined && typeof dadosAgente.dataDeIncorporacao !== 'string') {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve ser uma string"
+                }
+            });
+        }
+
+        if (dadosAgente.cargo !== undefined && typeof dadosAgente.cargo !== 'string') {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    cargo: "Campo 'cargo' deve ser uma string"
+                }
+            });
+        }
+
+        // Validação de valores específicos
+        if (dadosAgente.cargo !== undefined) {
+            const cargosValidos = ['delegado', 'inspetor', 'escrivao', 'agente'];
+            if (!cargosValidos.includes(dadosAgente.cargo)) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Parâmetros inválidos",
+                    errors: {
+                        cargo: "Campo 'cargo' deve ser 'delegado', 'inspetor', 'escrivao' ou 'agente'"
+                    }
+                });
+            }
+        }
+
         // Validação básica de formato de data se fornecida
         if (dadosAgente.dataDeIncorporacao) {
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
