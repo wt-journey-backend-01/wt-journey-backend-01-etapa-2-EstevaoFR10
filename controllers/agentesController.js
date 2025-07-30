@@ -116,26 +116,8 @@ function updateAgente(req, res) {
             });
         }
 
-        // Validação de tipos de dados - detectar payload em formato incorreto
-        const camposPermitidos = ['nome', 'dataDeIncorporacao', 'cargo'];
-        
-        // Verificar se há campos não permitidos
-        const camposInvalidos = Object.keys(dadosAgente).filter(campo => 
-            campo !== 'id' && !camposPermitidos.includes(campo)
-        );
-        
-        if (camposInvalidos.length > 0) {
-            return res.status(400).json({
-                status: 400,
-                message: "Parâmetros inválidos",
-                errors: {
-                    [camposInvalidos[0]]: `Campo '${camposInvalidos[0]}' não é permitido`
-                }
-            });
-        }
-
-        // Validação de tipos de dados para campos fornecidos - só valida se o valor não for string válida
-        if (dadosAgente.nome !== undefined && dadosAgente.nome !== null && dadosAgente.nome !== '' && typeof dadosAgente.nome !== 'string') {
+        // Validação simples para detectar payload em formato incorreto (tipos não-string em campos principais)
+        if (dadosAgente.nome !== undefined && dadosAgente.nome !== null && typeof dadosAgente.nome !== 'string') {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -145,17 +127,7 @@ function updateAgente(req, res) {
             });
         }
 
-        if (dadosAgente.dataDeIncorporacao !== undefined && dadosAgente.dataDeIncorporacao !== null && dadosAgente.dataDeIncorporacao !== '' && typeof dadosAgente.dataDeIncorporacao !== 'string') {
-            return res.status(400).json({
-                status: 400,
-                message: "Parâmetros inválidos",
-                errors: {
-                    dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve ser uma string"
-                }
-            });
-        }
-
-        if (dadosAgente.cargo !== undefined && dadosAgente.cargo !== null && dadosAgente.cargo !== '' && typeof dadosAgente.cargo !== 'string') {
+        if (dadosAgente.cargo !== undefined && dadosAgente.cargo !== null && typeof dadosAgente.cargo !== 'string') {
             return res.status(400).json({
                 status: 400,
                 message: "Parâmetros inválidos",
@@ -165,18 +137,14 @@ function updateAgente(req, res) {
             });
         }
 
-        // Validação de valores específicos - só valida se cargo for fornecido e não vazio
-        if (dadosAgente.cargo && dadosAgente.cargo.trim() !== '') {
-            const cargosValidos = ['delegado', 'inspetor', 'escrivao', 'agente'];
-            if (!cargosValidos.includes(dadosAgente.cargo)) {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Parâmetros inválidos",
-                    errors: {
-                        cargo: "Campo 'cargo' deve ser 'delegado', 'inspetor', 'escrivao' ou 'agente'"
-                    }
-                });
-            }
+        if (dadosAgente.dataDeIncorporacao !== undefined && dadosAgente.dataDeIncorporacao !== null && typeof dadosAgente.dataDeIncorporacao !== 'string') {
+            return res.status(400).json({
+                status: 400,
+                message: "Parâmetros inválidos",
+                errors: {
+                    dataDeIncorporacao: "Campo 'dataDeIncorporacao' deve ser uma string"
+                }
+            });
         }
 
         // Validação básica de formato de data se fornecida
